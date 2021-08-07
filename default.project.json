@@ -9,6 +9,9 @@
       },
       "Knit": {
         "$path": "src/Knit"
+      },
+      "TestEZ":{
+        "$path": "src/TestEZ"
       }
     },
 
