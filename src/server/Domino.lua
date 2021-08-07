@@ -1,10 +1,13 @@
 local Domino = {}
+Domino.__index = Domino
 
-function Domino:new(pip1,pip2)
+function Domino.new(pip1,pip2)
+    local self = setmetatable({},Domino)
     self.isDouble = pip1 == pip2
     self.isPointingInward = false
     self.pip1 = pip1
     self.pip2 = pip2
+    return self
 end
 
 function Domino:getOutwardValue()
