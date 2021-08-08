@@ -7,6 +7,11 @@ Board.__index = Board
 function Board.new()
     local self = setmetatable({},Board)
     self.currentState = "StartWithSpinner"
+    self.Spinner = nil
+    self.North = {}
+    self.South = {}
+    self.East = {}
+    self.West = {}
     return self
 end
 
@@ -21,13 +26,33 @@ function Board:addDomino(domino,location)
     if location == "Spinner" then
         if domino.isDouble then
             self.currentState = nextState
-            return
+            self.Spinner = domino
+            return true
         end
     end
 
+    local pip = nil
     if nextState == self.currentState then
-        local pip = self:getOutwardPipValue(location)
-        return pip == domino.pip1 or pip == domino.pip2
+        pip = self:getOutwardPipValue(location)
+    elseif self.Spinner then
+        pip = self.Spinner.pip1
+    end
+
+    if not pip then
+        return false
+    end
+
+    if pip == domino.pip1 then
+        self.currentState = nextState
+        table.insert(self[location], domino)
+        return true
+    elseif pip == domino.pip2 then
+        self.currentState = nextState
+        table.insert(self[location], domino)
+        domino.isInverted = true
+        return true
+    else
+        return false
     end
 end
 

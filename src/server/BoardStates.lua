@@ -61,7 +61,7 @@ local BoardStates = {
             North="East",
             South="East",
             East="East",
-            West="West"
+            West="Full"
         }
     },
     West = {
@@ -71,7 +71,7 @@ local BoardStates = {
         NextState = {
             North="West",
             South="West",
-            East="East",
+            East="Full",
             West="West"
         }
     },
