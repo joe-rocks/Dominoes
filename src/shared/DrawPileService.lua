@@ -1,7 +1,7 @@
 local Knit = require(game:GetService("ReplicatedStorage").Knit)
-local Signal = require(Knit.Util.Signal)
+-- local Signal = require(Knit.Util.Signal)
 local RemoteSignal = require(Knit.Util.Remote.RemoteSignal)
-local RemoteProperty = require(Knit.Util.Remote.RemoteProperty)
+-- local RemoteProperty = require(Knit.Util.Remote.RemoteProperty)
 
 local DrawPileService = Knit.CreateService {
     Name = "DrawPileService";

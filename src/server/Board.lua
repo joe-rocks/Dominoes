@@ -56,4 +56,41 @@ function Board:addDomino(domino,location)
     end
 end
 
+function Board:getOutwardPipValue(location)
+    local domino = self:getLastDomino(location)
+    return domino:getOutwardPipValue()
+end
+
+function Board:getScore(location)
+    if not location then
+        local score = 0
+        local state = States[self.currentState]
+        local scoreLocations = state.Score
+        for _,loc in ipairs(scoreLocations) do
+            score += self:getScore(loc)
+        end
+        if score % 5 ~= 0 then
+            print("No score"..score)
+            score = 0
+        end
+        return score
+    end
+
+    local domino = self:getLastDomino(location)
+    return domino:getOutwardValue()
+end
+
+function Board:getLastDomino(location)
+    local dominoList = self[location]
+    if not dominoList or location == "Spinner" then
+        return dominoList
+    end
+
+    if #dominoList == 0 then
+        return nil
+    else
+        return dominoList[#dominoList]
+    end
+end
+
 return Board
