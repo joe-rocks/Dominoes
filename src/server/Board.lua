@@ -4,9 +4,9 @@ local States = require(script.Parent.BoardStates)
 local Board = {}
 Board.__index = Board
 
-function Board.new()
+function Board.new(start)
     local self = setmetatable({},Board)
-    self.currentState = "StartWithSpinner"
+    self.currentState = start or "StartWithSpinner"
     self.Spinner = nil
     self.North = {}
     self.South = {}
@@ -23,13 +23,27 @@ function Board:addDomino(domino,location)
         return false
     end
 
+    if self.currentState == "StartWithAny" then
+        table.insert(self.North, domino)
+        self.currentState = nextState
+        return true
+    end
+
     if location == "Spinner" then
         if domino.isDouble then
             self.currentState = nextState
             self.Spinner = domino
             return true
         end
-    end
+	elseif self.currentState == "North" and location == "South" then
+		local southDomino = self.North[0]
+        print("fixme")
+		if southDomino.isInverted then
+			return domino.pip2
+        else
+            return domino.pip1
+		end
+	end
 
     local pip = nil
     if nextState == self.currentState then
