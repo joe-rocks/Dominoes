@@ -36,13 +36,18 @@ function Board:addDomino(domino,location)
             return true
         end
 	elseif self.currentState == "North" and location == "South" then
-		local southDomino = self.North[0]
-        print("fixme")
-		if southDomino.isInverted then
-			return domino.pip2
+		local southDomino = self.North[1]
+        local southPip = southDomino.isInverted and southDomino.pip2 or southDomino.pip1
+        if southPip == domino.pip1 then
+            table.insert(self[location], 1, domino)
+            domino.isInverted = true
+            return true
+        elseif southPip == domino.pip2 then
+            table.insert(self[location], 1, domino)
+            return true
         else
-            return domino.pip1
-		end
+            return false
+        end
 	end
 
     local pip = nil

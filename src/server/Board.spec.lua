@@ -61,5 +61,13 @@ return function()
             expect(board:getScore()).to.equal(15)
         end)
         
+		it("should score 5", function()
+			local board = Board.new()
+			board:addDomino(Domino.new(6,6),"Spinner")
+			board:addDomino(Domino.new(6,3),"North")
+			board:addDomino(Domino.new(6,2),"South")
+			expect(board:getScore()).to.equal(5)
+		end)
+
     end)
 end
