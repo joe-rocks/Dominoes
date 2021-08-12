@@ -24,11 +24,11 @@ function PointsService:AddPoints(player, amount)
     local points = self:GetPoints(player)
     points = points + amount
     self.PointsPerPlayer[player] = points
-    if (amount ~= 0) then
+    if amount ~= 0 then
         self.PointsChanged:Fire(player, points)
         self.Client.PointsChanged:Fire(player, points)
     end
-    if (points > self.Client.MostPoints:Get()) then
+    if points > self.Client.MostPoints:Get() then
         self.Client.MostPoints:Set(points)
     end
 end
