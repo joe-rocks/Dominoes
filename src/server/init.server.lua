@@ -4,6 +4,9 @@ local Knit = require(ReplicatedStorage.Knit)
 local PointsService = require(ReplicatedStorage.Common.PointsService)
 print(PointsService)
 
+local DrawPileService = require(ReplicatedStorage.Common.DrawPileService)
+DrawPileService:init()
+
 Knit.Start():Catch(warn)
 
 --------------------------------------------------------------------------------------------------- 
