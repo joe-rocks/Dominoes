@@ -19,7 +19,8 @@ end
 
 function DrawPileService:init()
     local Pip = workspace.Pip
-    local move = CFrame.new(Pip.Size.X,0,0)
+    local moveRight = CFrame.new(Pip.Size.X,0,0)
+    local moveForward = CFrame.new(0,0,Pip.Size.Z)
     local cf = Pip.CFrame
     local Domino = require(ServerScriptService.Server.Domino)
     local highestPipValue = 6
@@ -27,10 +28,20 @@ function DrawPileService:init()
         for j = i,highestPipValue do
             Domino.new(i,j)
             local pip = Pip:clone()
-            cf *= move
+            local pip2 = Pip:clone()
+
+            pip2.CFrame = cf * moveForward
+            cf *= moveRight
             pip.CFrame = cf
+
+            local color = j * highestPipValue * 10
+            pip2.Color = Color3.new(0,0,color)
+
             pip.Name = "Pip_" .. i .. "_" .. j
+            pip2.Name = "Pip2_" .. i .. "_" .. j
+
             pip.Parent = workspace
+            pip2.Parent = workspace
         end
     end
 end
