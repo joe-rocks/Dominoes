@@ -19,23 +19,35 @@ end
 
 function DrawPileService:init()
     local Pip = workspace.Pip
+    local gui = Instance.new("SurfaceGui")
+    gui.Name = "gui"
+    gui.Parent = Pip
+    local text = Instance.new("TextLabel")
+    text.Name = "text"
+    text.Parent = gui
+
     local moveRight = CFrame.new(Pip.Size.X,0,0)
     local moveForward = CFrame.new(0,0,Pip.Size.Z)
-    local cf = Pip.CFrame
+    local currentPipPosition = Pip.CFrame
+
     local Domino = require(ServerScriptService.Server.Domino)
     local highestPipValue = 6
+
     for i = 0,highestPipValue do
         for j = i,highestPipValue do
             Domino.new(i,j)
             local pip = Pip:clone()
             local pip2 = Pip:clone()
 
-            pip2.CFrame = cf * moveForward
-            cf *= moveRight
-            pip.CFrame = cf
+            pip.gui.text.Text = i
+            pip2.gui.text.Text = j
 
-            local color = j * highestPipValue * 10
-            pip2.Color = Color3.new(0,0,color)
+            currentPipPosition = currentPipPosition * moveRight
+            pip.CFrame = currentPipPosition
+            pip2.CFrame = currentPipPosition * moveForward
+
+            pip.Color = Color3.new((highestPipValue-i)/highestPipValue,0,i/highestPipValue)
+            pip2.Color = Color3.new((highestPipValue-j)/highestPipValue,0,j/highestPipValue)
 
             pip.Name = "Pip_" .. i .. "_" .. j
             pip2.Name = "Pip2_" .. i .. "_" .. j
