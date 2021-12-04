@@ -21,9 +21,13 @@ function DrawPileService:init()
     local Pip = workspace.Pip
     local gui = Instance.new("SurfaceGui")
     gui.Name = "gui"
+    gui.Face = "Top"
     gui.Parent = Pip
     local text = Instance.new("TextLabel")
     text.Name = "text"
+    text.Text = "?"
+    text.Size = UDim2.new(0,100,0,100)
+    text.Position = UDim2.new(0.5,0,0.5,0)
     text.Parent = gui
 
     local moveRight = CFrame.new(Pip.Size.X,0,0)
