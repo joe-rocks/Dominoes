@@ -22,12 +22,17 @@ function DrawPileService:init()
     local gui = Instance.new("SurfaceGui")
     gui.Name = "gui"
     gui.Face = "Top"
+    gui.CanvasSize = Vector2.new(200,200)
     gui.Parent = Pip
     local text = Instance.new("TextLabel")
     text.Name = "text"
     text.Text = "?"
-    text.Size = UDim2.new(0,100,0,100)
-    text.Position = UDim2.new(0.5,0,0.5,0)
+    text.TextSize = 14
+    text.TextScaled = true
+    text.BorderSizePixel = 0
+    text.BackgroundTransparency = 0.75
+    text.Size = UDim2.new(0.5,0,0.5,0)
+    text.Position = UDim2.new(0.25,0,0.25,0)
     text.Parent = gui
 
     local moveRight = CFrame.new(Pip.Size.X,0,0)
@@ -40,8 +45,14 @@ function DrawPileService:init()
     for i = 0,highestPipValue do
         for j = i,highestPipValue do
             Domino.new(i,j)
+
+            local singleDomino = Instance.new("Model")
+            singleDomino.Name = "Domino_" .. i .. "_" .. j
+
             local pip = Pip:clone()
             local pip2 = Pip:clone()
+            pip.Parent = singleDomino
+            pip2.Parent = singleDomino
 
             pip.gui.text.Text = i
             pip2.gui.text.Text = j
@@ -50,16 +61,33 @@ function DrawPileService:init()
             pip.CFrame = currentPipPosition
             pip2.CFrame = currentPipPosition * moveForward
 
-            pip.Color = Color3.new((highestPipValue-i)/highestPipValue,0,i/highestPipValue)
-            pip2.Color = Color3.new((highestPipValue-j)/highestPipValue,0,j/highestPipValue)
+            pip.Color = Color3.new( (highestPipValue-i)/highestPipValue, 0, i/highestPipValue )
+            pip2.Color = Color3.new( (highestPipValue-j)/highestPipValue, 0, j/highestPipValue )
 
             pip.Name = "Pip_" .. i .. "_" .. j
             pip2.Name = "Pip2_" .. i .. "_" .. j
 
-            pip.Parent = workspace
-            pip2.Parent = workspace
+            singleDomino.Parent = workspace
         end
     end
+
+    Pip.CanCollide = false
+
+    local seed = 5
+    local distance = 200
+    local r = Random.new(seed)
+    for h = 1,10 do
+        for i = 0,highestPipValue do
+            for j = i,highestPipValue do
+                local d = "Domino_" .. i .. "_" .. j
+                local domino = workspace[d]
+                local x = r:NextNumber() * distance
+                local z = r:NextNumber() * distance
+                domino:MoveTo(domino.Position * Vector3.new(x,0,z))
+            end
+        end
+    end
+
 end
 
 -- Initialize
