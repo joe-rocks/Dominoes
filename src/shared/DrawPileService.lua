@@ -47,12 +47,11 @@ function DrawPileService:init()
             Domino.new(i,j)
 
             local singleDomino = Instance.new("Model")
-            singleDomino.Name = "Domino_" .. i .. "_" .. j
-
             local pip = Pip:clone()
             local pip2 = Pip:clone()
-            pip.Parent = singleDomino
-            pip2.Parent = singleDomino
+
+            singleDomino.Name = "Domino_" .. i .. "_" .. j
+            singleDomino.PrimaryPart = pip
 
             pip.gui.text.Text = i
             pip2.gui.text.Text = j
@@ -67,6 +66,14 @@ function DrawPileService:init()
             pip.Name = "Pip_" .. i .. "_" .. j
             pip2.Name = "Pip2_" .. i .. "_" .. j
 
+            local WeldConstraint = Instance.new("WeldConstraint")
+            WeldConstraint.Part0 = pip
+            WeldConstraint.Part1 = pip2
+            WeldConstraint.Parent = WeldConstraint.Part0
+
+            pip2.Anchored = false
+            pip.Parent = singleDomino
+            pip2.Parent = singleDomino
             singleDomino.Parent = workspace
         end
     end
@@ -74,18 +81,27 @@ function DrawPileService:init()
     Pip.CanCollide = false
 
     local seed = 5
-    local distance = 200
+    local distance = 50
     local r = Random.new(seed)
     for h = 1,10 do
+        local foo
         for i = 0,highestPipValue do
             for j = i,highestPipValue do
                 local d = "Domino_" .. i .. "_" .. j
                 local domino = workspace[d]
-                local x = r:NextNumber() * distance
-                local z = r:NextNumber() * distance
-                domino:MoveTo(domino.Position * Vector3.new(x,0,z))
+                local x = (r:NextNumber()-0.5) * distance
+				local z = (r:NextNumber()-0.5) * distance
+                local goal = {}
+                goal.CFrame = domino.PrimaryPart.CFrame * CFrame.new(x,0,z)
+
+                local tweenInfo = TweenInfo.new(0.5)
+                local TweenService = game:GetService("TweenService")
+                local tween = TweenService:Create(domino.PrimaryPart, tweenInfo, goal)
+                tween:Play()
+                foo = tween
             end
         end
+        foo.Completed:Wait()
     end
 
 end
