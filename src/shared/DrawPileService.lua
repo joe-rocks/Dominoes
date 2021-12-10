@@ -83,16 +83,17 @@ function DrawPileService:init()
     local seed = 5
     local distance = 50
     local r = Random.new(seed)
-    for h = 1,10 do
+    for h = 1,100 do
         local foo
         for i = 0,highestPipValue do
             for j = i,highestPipValue do
                 local d = "Domino_" .. i .. "_" .. j
                 local domino = workspace[d]
-                local x = (r:NextNumber()-0.5) * distance
-				local z = (r:NextNumber()-0.5) * distance
+                -- local x = (r:NextNumber()-0.5) * distance
+				-- local z = (r:NextNumber()-0.5) * distance
                 local goal = {}
-                goal.CFrame = domino.PrimaryPart.CFrame * CFrame.new(x,0,z)
+                -- goal.CFrame = domino.PrimaryPart.CFrame * CFrame.new(x,0,z)
+                goal.CFrame = domino.PrimaryPart.CFrame * CFrame.new(r:NextUnitVector())
 
                 local tweenInfo = TweenInfo.new(0.5)
                 local TweenService = game:GetService("TweenService")
