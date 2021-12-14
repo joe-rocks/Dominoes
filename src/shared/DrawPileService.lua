@@ -71,6 +71,7 @@ function DrawPileService:init()
             WeldConstraint.Part1 = pip2
             WeldConstraint.Parent = WeldConstraint.Part0
 
+            pip.Anchored = false
             pip2.Anchored = false
             pip.Parent = singleDomino
             pip2.Parent = singleDomino
@@ -81,28 +82,29 @@ function DrawPileService:init()
     Pip.CanCollide = false
 
     local seed = 5
-    local distance = 50
+    local good = 0
+    local bad = 0
     local r = Random.new(seed)
     for h = 1,100 do
-        local foo
         for i = 0,highestPipValue do
             for j = i,highestPipValue do
                 local d = "Domino_" .. i .. "_" .. j
                 local domino = workspace[d]
-                -- local x = (r:NextNumber()-0.5) * distance
-				-- local z = (r:NextNumber()-0.5) * distance
-                local goal = {}
-                -- goal.CFrame = domino.PrimaryPart.CFrame * CFrame.new(x,0,z)
-                goal.CFrame = domino.PrimaryPart.CFrame * CFrame.new(r:NextUnitVector())
+                local previousPosition = domino.PrimaryPart.Position
+                local force = r:NextUnitVector() * 1000
+                domino.PrimaryPart:ApplyImpulse(force)
 
-                local tweenInfo = TweenInfo.new(0.5)
-                local TweenService = game:GetService("TweenService")
-                local tween = TweenService:Create(domino.PrimaryPart, tweenInfo, goal)
-                tween:Play()
-                foo = tween
+                local travel = (domino.PrimaryPart.Position - previousPosition).Magnitude
+                if travel == 0 then
+                    bad += 1
+                    domino.PrimaryPart:ApplyImpulse(Vector3.new(200,3000,200))
+                else
+                    good += 1
+                end
+                -- print(h,i,j,"good",good,"bad",bad)
             end
+            wait(2)
         end
-        foo.Completed:Wait()
     end
 
 end
