@@ -73,21 +73,41 @@ function DrawPileService:init()
             WeldConstraint.Part1 = pip2
             WeldConstraint.Parent = WeldConstraint.Part0
 
-            local function pipTouched(part)
-                if part.Parent ~= nil
+            local touchedPart = nil
+            local pipTouched,pipTouchEnded
+            local touchedSignal,touchedSignal2
+            local touchEndedSignal,touchEndedSignal2
+            local function launchDomino()
+                local x = r:NextNumber(-1,1)
+                local z = r:NextNumber(-1,1)
+                local force = Vector3.new( 200*x, 2000, 200*z )
+                print(j,i,force)
+                pip:ApplyImpulse(force)
+            end
+            pipTouched = function (part)
+                if not touchedPart
+                and part.Parent ~= nil
                 and part.Parent:FindFirstChild("Humanoid")
-                then
-                    if pip.AssemblyLinearVelocity == Vector3.zero then
-                        local x = r:NextNumber(-1,1)
-                        local z = r:NextNumber(-1,1)
-                        local force = Vector3.new( 200*x, 2000, 200*z )
-                        print(force)
-                        pip:ApplyImpulse(force)
-                    end
+                and pip.AssemblyLinearVelocity == Vector3.zero then
+                    touchedPart = part
+                    touchedSignal:Disconnect()
+                    touchedSignal2:Disconnect()
+                    touchEndedSignal = pip.TouchEnded:Connect(pipTouchEnded)
+                    touchEndedSignal2 = pip2.TouchEnded:Connect(pipTouchEnded)
                 end
             end
-            pip.Touched:Connect(pipTouched)
-            pip2.Touched:Connect(pipTouched)
+            pipTouchEnded = function (part)
+                if touchedPart == part then
+                    touchedPart = nil
+                    touchEndedSignal:Disconnect()
+                    touchEndedSignal2:Disconnect()
+                    touchedSignal = pip.Touched:Connect(pipTouched)
+                    touchedSignal2 = pip2.Touched:Connect(pipTouched)
+                    launchDomino()
+                end
+            end
+            touchedSignal = pip.Touched:Connect(pipTouched)
+            touchedSignal2 = pip2.Touched:Connect(pipTouched)
 
             pip.Anchored = false
             pip2.Anchored = false
