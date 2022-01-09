@@ -13,8 +13,24 @@ local DrawPileService = Knit.CreateService {
     };
 }
 
+DrawPileService.highestPipValue = 6
+
 function DrawPileService:removeDomino(domino)
     self.DrawPile[domino] = nil
+end
+
+function DrawPileService:shuffle()
+    local dp = self.DrawPile
+    local n = #dp
+    for i = 0,self.highestPipValue*self.highestPipValue do
+		local x = self.rand:NextInteger(1,n)
+		local y = self.rand:NextInteger(1,n)
+        print(i,x,y)
+
+        local a = dp[x].part.PrimaryPart
+        local b = dp[y].part.PrimaryPart
+		a.CFrame,b.CFrame = b.CFrame,a.CFrame
+    end
 end
 
 function DrawPileService:init()
@@ -40,13 +56,13 @@ function DrawPileService:init()
     local currentPipPosition = Pip.CFrame
 
     local Domino = require(ServerScriptService.Server.Domino)
-    local highestPipValue = 6
     local seed = 5
-    local r = Random.new(seed)
+    self.rand = Random.new(seed)
 
-    for i = 0,highestPipValue do
-        for j = i,highestPipValue do
-            Domino.new(i,j)
+    for i = 0,DrawPileService.highestPipValue do
+        for j = i,DrawPileService.highestPipValue do
+            local domino = {}
+            domino.object = Domino.new(i,j)
 
             local singleDomino = Instance.new("Model")
             local pip = Pip:clone()
@@ -62,8 +78,8 @@ function DrawPileService:init()
             pip.CFrame = currentPipPosition
             pip2.CFrame = currentPipPosition * moveForward
 
-            pip.Color = Color3.new( (highestPipValue-i)/highestPipValue, 0, i/highestPipValue )
-            pip2.Color = Color3.new( (highestPipValue-j)/highestPipValue, 0, j/highestPipValue )
+            pip.Color = Color3.new( (DrawPileService.highestPipValue-i)/DrawPileService.highestPipValue, 0, i/DrawPileService.highestPipValue )
+            pip2.Color = Color3.new( (DrawPileService.highestPipValue-j)/DrawPileService.highestPipValue, 0, j/DrawPileService.highestPipValue )
 
             pip.Name = "Pip_" .. i .. "_" .. j
             pip2.Name = "Pip2_" .. i .. "_" .. j
@@ -74,17 +90,16 @@ function DrawPileService:init()
             WeldConstraint.Parent = WeldConstraint.Part0
 
             local function pipTouched(part)
-                if part.Parent ~= nil
-                and part.Parent:FindFirstChild("Humanoid")
-                then
-                    if pip.AssemblyLinearVelocity == Vector3.zero then
-                        local x = r:NextNumber(-1,1)
-                        local z = r:NextNumber(-1,1)
-                        local force = Vector3.new( 200*x, 2000, 200*z )
-                        print(force)
-                        pip:ApplyImpulse(force)
-                    end
-                end
+                -- if part.Parent ~= nil
+                -- and part.Parent:FindFirstChild("Humanoid")
+                -- then
+                --     if pip.AssemblyLinearVelocity == Vector3.zero then
+                --         local x = self.rand:NextNumber(-1,1)
+                --         local z = self.rand:NextNumber(-1,1)
+                --         local force = Vector3.new( 200*x, 2000, 200*z )
+                --         pip:ApplyImpulse(force)
+                --     end
+                -- end
             end
             pip.Touched:Connect(pipTouched)
             pip2.Touched:Connect(pipTouched)
@@ -94,9 +109,12 @@ function DrawPileService:init()
             pip.Parent = singleDomino
             pip2.Parent = singleDomino
             singleDomino.Parent = workspace
+            domino.part = singleDomino
+            table.insert(self.DrawPile, domino)
         end --j = i,highestPipValue
     end --i = 0,highestPipValue
 
+    self:shuffle()
 end
 
 -- Initialize
