@@ -1,9 +1,12 @@
 local ServerScriptService = game:GetService("ServerScriptService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
 local Knit = require(ReplicatedStorage.Knit)
 -- local Signal = require(Knit.Util.Signal)
 local RemoteSignal = require(Knit.Util.Remote.RemoteSignal)
 -- local RemoteProperty = require(Knit.Util.Remote.RemoteProperty)
+local Domino = require(ServerScriptService.Server.Domino)
+local JumpUp = require(ServerScriptService.Server.JumpUp)
 
 local DrawPileService = Knit.CreateService {
     Name = "DrawPileService";
@@ -27,10 +30,35 @@ function DrawPileService:shuffle()
 		local y = self.rand:NextInteger(1,n)
         print(i,x,y)
 
-        local a = dp[x].part.PrimaryPart
-        local b = dp[y].part.PrimaryPart
+        local a = dp[x].model.PrimaryPart
+        local b = dp[y].model.PrimaryPart
 		a.CFrame,b.CFrame = b.CFrame,a.CFrame
     end
+end
+
+function DrawPileService:singleTween()
+    local part = Instance.new("Part")
+    part.Anchored = true
+    part.Position += Vector3.new(0,10,-10)
+    part.Parent = workspace
+    local ti = TweenInfo.new(
+        1,
+        Enum.EasingStyle.Bounce,
+        Enum.EasingDirection.In,
+        20,
+        false
+    )
+    local goalPosition = CFrame.new(0,part.Size.X,0)
+    local goalRotation = CFrame.Angles(0,0,math.rad(-90))
+    local goal = {
+        CFrame = part.CFrame:ToWorldSpace(goalPosition * goalRotation)
+    }
+    local tween = game:GetService("TweenService"):Create(
+        part,
+        ti,
+        goal
+    )
+    tween:Play()
 end
 
 function DrawPileService:init()
@@ -55,7 +83,6 @@ function DrawPileService:init()
     local moveForward = CFrame.new(0,0,Pip.Size.Z)
     local currentPipPosition = Pip.CFrame
 
-    local Domino = require(ServerScriptService.Server.Domino)
     local seed = 5
     self.rand = Random.new(seed)
 
@@ -130,12 +157,19 @@ function DrawPileService:init()
             pip.Parent = singleDomino
             pip2.Parent = singleDomino
             singleDomino.Parent = workspace
-            domino.part = singleDomino
+            domino.model = singleDomino--should be called "model"?
             table.insert(self.DrawPile, domino)
         end --j = i,highestPipValue
     end --i = 0,highestPipValue
 
     self:shuffle()
+
+    for _,v in ipairs(self.DrawPile) do
+        local j = JumpUp.new(v.model.PrimaryPart)
+        j:activate()
+    end
+
+    self:singleTween()
 end
 
 -- Initialize
