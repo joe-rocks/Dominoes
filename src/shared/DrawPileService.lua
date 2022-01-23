@@ -146,7 +146,7 @@ function DrawPileService:init()
                     touchEndedSignal2:Disconnect()
                     touchedSignal = pip.Touched:Connect(pipTouched)
                     touchedSignal2 = pip2.Touched:Connect(pipTouched)
-                    launchDomino()
+                    -- launchDomino()
                 end
             end
             touchedSignal = pip.Touched:Connect(pipTouched)
@@ -164,6 +164,7 @@ function DrawPileService:init()
 
     self:shuffle()
 
+    wait(5)
     for _,v in ipairs(self.DrawPile) do
         local j = JumpUp.new(v.model.PrimaryPart)
         j:activate()

@@ -37,6 +37,7 @@ end
 function JumpUp:activate()
 	-- If the object is tweening, prevent it from being tweened again
 	if self.IsRunning then
+        self.part.anchored = "nothing"
 		return
 	end
 
@@ -50,7 +51,7 @@ end
 function JumpUp.new(part)
     local self = setmetatable({},JumpUp)
     self.part = part
-    self.TweenTime = 2
+    self.TweenTime = 23
     self.RepeatCount = 0
     self.EasingStyle = Enum.EasingStyle.Sine
     self.EasingDirection = Enum.EasingDirection.InOut
@@ -64,7 +65,7 @@ function JumpUp.new(part)
     end)
 
     local goalPosition = CFrame.new(0,self.part.Size.X,0)
-    local goalRotation = CFrame.Angles(0,0,math.rad(-90))
+    local goalRotation = CFrame.Angles(math.rad(-90),0,math.rad(-90))
     self.goal = part.CFrame:ToWorldSpace(goalPosition * goalRotation)
 
     return self
