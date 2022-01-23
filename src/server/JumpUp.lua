@@ -16,13 +16,6 @@ function JumpUp:getTweenInfo()
     return ti
 end
 
-function JumpUp:getGoal()
-    local goal = {
-        CFrame = self.goalPosition * self.goalRotation
-    }
-    return goal
-end
-
 function JumpUp:getTweenCompleted()
 	local tweenCompleted = function()
 		self.IsRunning = false
@@ -32,9 +25,9 @@ end
 
 function JumpUp:getTweenObject()
     local tween = TweenService:Create(
-        self.part,
+        self.CFrame,
         self:getTweenInfo(),
-        self:getGoal()
+        { Value = self.goal }
     )
 	-- On tween completion, make object clickable again
 	tween.Completed:Connect(self:getTweenCompleted())
@@ -57,14 +50,23 @@ end
 function JumpUp.new(part)
     local self = setmetatable({},JumpUp)
     self.part = part
-    self.TweenTime = 50
+    self.TweenTime = 2
     self.RepeatCount = 0
     self.EasingStyle = Enum.EasingStyle.Sine
     self.EasingDirection = Enum.EasingDirection.InOut
     self.IsTweenReverse = false
     self.IsRunning = false
-    self.goalPosition = CFrame.new(0,self.part.Size.X,0)
-    self.goalRotation = CFrame.Angles(math.rad(-90),0,0)
+
+    self.CFrame = Instance.new("CFrameValue")
+    self.CFrame.Value = part.CFrame
+    self.CFrame:GetPropertyChangedSignal("Value"):Connect(function()
+        self.part.CFrame = self.CFrame.Value
+    end)
+
+    local goalPosition = CFrame.new(0,self.part.Size.X,0)
+    local goalRotation = CFrame.Angles(0,0,math.rad(-90))
+    self.goal = part.CFrame:ToWorldSpace(goalPosition * goalRotation)
+
     return self
 end
 
