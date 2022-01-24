@@ -19,6 +19,7 @@ end
 function JumpUp:getTweenCompleted()
 	local tweenCompleted = function()
 		self.IsRunning = false
+        print("DONE",self.part.Name,self.part.CFrame.Position)
 	end
 	return tweenCompleted
 end
@@ -37,7 +38,6 @@ end
 function JumpUp:activate()
 	-- If the object is tweening, prevent it from being tweened again
 	if self.IsRunning then
-        self.part.anchored = "nothing"
 		return
 	end
 
@@ -51,7 +51,7 @@ end
 function JumpUp.new(part)
     local self = setmetatable({},JumpUp)
     self.part = part
-    self.TweenTime = 23
+    self.TweenTime = 11
     self.RepeatCount = 0
     self.EasingStyle = Enum.EasingStyle.Sine
     self.EasingDirection = Enum.EasingDirection.InOut
@@ -61,6 +61,10 @@ function JumpUp.new(part)
     self.CFrame = Instance.new("CFrameValue")
     self.CFrame.Value = part.CFrame
     self.CFrame:GetPropertyChangedSignal("Value"):Connect(function()
+        local distance = (self.part.CFrame.Position - self.CFrame.Value.Position).Magnitude
+        if distance > 10000 then
+            print(distance)
+        end
         self.part.CFrame = self.CFrame.Value
     end)
 

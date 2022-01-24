@@ -79,8 +79,14 @@ function DrawPileService:init()
     text.Position = UDim2.new(0.25,0,0.25,0)
     text.Parent = gui
 
-    local moveRight = CFrame.new(Pip.Size.X,0,0)
-    local moveForward = CFrame.new(0,0,Pip.Size.Z)
+    local moveRight = CFrame.new(
+        Pip.Size.X * 1.5,
+        0,
+        0)
+    local moveForward = CFrame.new(
+        0,
+        0,
+        Pip.Size.Z)
     local currentPipPosition = Pip.CFrame
 
     local seed = 5
