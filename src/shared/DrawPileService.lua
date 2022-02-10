@@ -80,7 +80,7 @@ function DrawPileService:init()
     text.Parent = gui
 
     local moveRight = CFrame.new(
-        Pip.Size.X * 1.5,
+        Pip.Size.X * 3,
         0,
         0)
     local moveForward = CFrame.new(
@@ -91,6 +91,7 @@ function DrawPileService:init()
 
     local seed = 5
     self.rand = Random.new(seed)
+    self.testParts = {}
 
     for i = 0,DrawPileService.highestPipValue do
         for j = i,DrawPileService.highestPipValue do
@@ -110,6 +111,12 @@ function DrawPileService:init()
             currentPipPosition = currentPipPosition * moveRight
             pip.CFrame = currentPipPosition
             pip2.CFrame = currentPipPosition * moveForward
+
+            local testPart = Instance.new("Part")
+            testPart.CFrame = currentPipPosition * moveForward * moveForward * moveForward
+            testPart.Name = "TestPart_" .. i .. "_" .. j
+            testPart.Parent = workspace
+            table.insert(self.testParts, testPart)
 
             pip.Color = Color3.new( (DrawPileService.highestPipValue-i)/DrawPileService.highestPipValue, 0, i/DrawPileService.highestPipValue )
             pip2.Color = Color3.new( (DrawPileService.highestPipValue-j)/DrawPileService.highestPipValue, 0, j/DrawPileService.highestPipValue )
@@ -153,6 +160,7 @@ function DrawPileService:init()
                     touchedSignal = pip.Touched:Connect(pipTouched)
                     touchedSignal2 = pip2.Touched:Connect(pipTouched)
                     -- launchDomino()
+                    pip.Anchored = false
                 end
             end
             touchedSignal = pip.Touched:Connect(pipTouched)
@@ -170,9 +178,13 @@ function DrawPileService:init()
 
     self:shuffle()
 
-    wait(5)
+    wait(2)
     for _,v in ipairs(self.DrawPile) do
         local j = JumpUp.new(v.model.PrimaryPart)
+        j:activate()
+    end
+    for _,v in ipairs(self.testParts) do
+        local j = JumpUp.new(v)
         j:activate()
     end
 

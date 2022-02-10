@@ -19,7 +19,8 @@ end
 function JumpUp:getTweenCompleted()
 	local tweenCompleted = function()
 		self.IsRunning = false
-        print("DONE",self.part.Name,self.part.CFrame.Position)
+        self.part.CFrame = self.goal
+        self.part.Anchored = true
 	end
 	return tweenCompleted
 end
@@ -51,26 +52,28 @@ end
 function JumpUp.new(part)
     local self = setmetatable({},JumpUp)
     self.part = part
-    self.TweenTime = 11
+    self.TweenTime = 2
     self.RepeatCount = 0
-    self.EasingStyle = Enum.EasingStyle.Sine
-    self.EasingDirection = Enum.EasingDirection.InOut
+    self.EasingStyle = Enum.EasingStyle.Linear
+    self.EasingDirection = Enum.EasingDirection.Out
     self.IsTweenReverse = false
     self.IsRunning = false
 
     self.CFrame = Instance.new("CFrameValue")
-    self.CFrame.Value = part.CFrame
+    self.CFrame.Value = self.part.CFrame
     self.CFrame:GetPropertyChangedSignal("Value"):Connect(function()
-        local distance = (self.part.CFrame.Position - self.CFrame.Value.Position).Magnitude
-        if distance > 10000 then
-            print(distance)
-        end
+        -- local distance = (self.part.CFrame.Position - self.CFrame.Value.Position).Magnitude
+        -- if distance > 10000 then
+        --     print(distance)
+        -- end
         self.part.CFrame = self.CFrame.Value
     end)
 
+    --Troubleshoot why eventually lands way far out: 6595266.5, 11761833, 462782.75
     local goalPosition = CFrame.new(0,self.part.Size.X,0)
     local goalRotation = CFrame.Angles(math.rad(-90),0,math.rad(-90))
-    self.goal = part.CFrame:ToWorldSpace(goalPosition * goalRotation)
+    local relativeGoal = goalPosition * goalRotation
+    self.goal = part.CFrame * relativeGoal
 
     return self
 end
