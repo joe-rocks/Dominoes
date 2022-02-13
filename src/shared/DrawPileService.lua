@@ -80,7 +80,7 @@ function DrawPileService:init()
     text.Parent = gui
 
     local moveRight = CFrame.new(
-        Pip.Size.X * 3,
+        Pip.Size.X * 1.5,
         0,
         0)
     local moveForward = CFrame.new(
