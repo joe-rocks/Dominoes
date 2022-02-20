@@ -26,14 +26,22 @@ function DrawPileService:shuffle()
         table.insert(self.DrawPile, domino)
     end
 
-    local n = #self.DrawPile
-    for _ = 0,42 do
-		local x = self.rand:NextInteger(1,n)
-		local y = self.rand:NextInteger(1,n)
-        local a = self.DrawPile[x].model.PrimaryPart
-        local b = self.DrawPile[y].model.PrimaryPart
-		a.CFrame,b.CFrame = b.CFrame,a.CFrame
+    -- local seed = 5
+    -- self.rand = Random.new(seed)
+    -- local n = #self.DrawPile
+    -- for _ = 0,42 do
+	-- 	local x = self.rand:NextInteger(1,n)
+	-- 	local y = self.rand:NextInteger(1,n)
+    --     local a = self.DrawPile[x].model.PrimaryPart
+    --     local b = self.DrawPile[y].model.PrimaryPart
+	-- 	a.CFrame,b.CFrame = b.CFrame,a.CFrame
+    -- end
+
+    for _,v in ipairs(self.DrawPile) do
+        local j = JumpUp.new(v.model.PrimaryPart)
+        j:activate()
     end
+
 end
 
 function DrawPileService:KnitInit()
@@ -48,13 +56,6 @@ function DrawPileService:KnitInit()
     game:GetService("Players").PlayerRemoving:Connect(function(player)
     end)
 
-    local seed = 5
-    self.rand = Random.new(seed)
-
-    -- for _,v in ipairs(self.DrawPile) do
-    --     local j = JumpUp.new(v.model.PrimaryPart)
-    --     j:activate()
-    -- end
 end
 
 return DrawPileService

@@ -7,6 +7,7 @@ local DrawPile = require(ReplicatedStorage.Common.DrawPileService)
 
 Knit.Start():Catch(warn)
 
+wait(2)
 DrawPile:shuffle()
 
 ---------------------------------------------------------------------------------------------------
