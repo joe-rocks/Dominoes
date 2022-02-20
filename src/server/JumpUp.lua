@@ -19,8 +19,10 @@ end
 function JumpUp:getTweenCompleted()
 	local tweenCompleted = function()
 		self.IsRunning = false
-        self.part.CFrame = self.goal
-        self.part.Anchored = true
+        --self.part.CFrame = self.goal
+		--self.part.Anchored = true
+		self.part.AssemblyLinearVelocity = Vector3.zero
+		self.part.AssemblyAngularVelocity = Vector3.zero
 	end
 	return tweenCompleted
 end
