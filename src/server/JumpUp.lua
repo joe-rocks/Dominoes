@@ -19,10 +19,7 @@ end
 function JumpUp:getTweenCompleted()
 	local tweenCompleted = function()
 		self.IsRunning = false
-        --self.part.CFrame = self.goal
-		--self.part.Anchored = true
-		self.part.AssemblyLinearVelocity = Vector3.zero
-		self.part.AssemblyAngularVelocity = Vector3.zero
+        self.part.Anchored = false
 	end
 	return tweenCompleted
 end
@@ -60,18 +57,14 @@ function JumpUp.new(part)
     self.EasingDirection = Enum.EasingDirection.Out
     self.IsTweenReverse = false
     self.IsRunning = false
+    self.part.Anchored = true
 
     self.CFrame = Instance.new("CFrameValue")
     self.CFrame.Value = self.part.CFrame
     self.CFrame:GetPropertyChangedSignal("Value"):Connect(function()
-        -- local distance = (self.part.CFrame.Position - self.CFrame.Value.Position).Magnitude
-        -- if distance > 10000 then
-        --     print(distance)
-        -- end
         self.part.CFrame = self.CFrame.Value
     end)
 
-    --Troubleshoot why eventually lands way far out: 6595266.5, 11761833, 462782.75
     local goalPosition = CFrame.new(0,self.part.Size.X,0)
     local goalRotation = CFrame.Angles(math.rad(-90),0,math.rad(-90))
     local relativeGoal = goalPosition * goalRotation
