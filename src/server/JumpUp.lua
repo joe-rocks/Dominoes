@@ -16,10 +16,29 @@ function JumpUp:getTweenInfo()
     return ti
 end
 
+local function createAttachment(parent)
+    local Attachment = Instance.new("Attachment")
+    Attachment.Parent = parent
+    return Attachment
+end
+
+local function createVectorForce(parent, Attachment)
+    local VectorForce = Instance.new("VectorForce")
+    VectorForce.Enabled = true
+    VectorForce.Parent = parent
+    VectorForce.ApplyAtCenterOfMass = true
+    local force = workspace.Gravity * parent.AssemblyMass * 1.1
+    VectorForce.Force = Vector3.new(0, 0, force)
+    VectorForce.Attachment0 = Attachment
+    return VectorForce
+end
+
 function JumpUp:getTweenCompleted()
 	local tweenCompleted = function()
 		self.IsRunning = false
         self.part.Anchored = false
+        local attachment = createAttachment(self.part)
+        local vectorForce = createVectorForce(self.part, attachment)
 	end
 	return tweenCompleted
 end
