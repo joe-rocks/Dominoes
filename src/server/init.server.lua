@@ -10,6 +10,10 @@ Knit.Start():Catch(warn)
 wait(2)
 DrawPile:shuffle()
 
+local ServerScriptService = game:GetService("ServerScriptService")
+local DominoWithColorPips = require(ServerScriptService.Server.DominoWithColorPips)
+
+
 ---------------------------------------------------------------------------------------------------
 
 local function runTests()
@@ -26,3 +30,16 @@ local function runTests()
 end
 
 runTests()
+
+local test
+for i = 1,50 do
+    test = DominoWithColorPips.new(1,2,6)
+    if test then
+        print(i .. " success")
+        break
+    end
+
+    print(i .. " failed")
+    wait(1)
+end
+
