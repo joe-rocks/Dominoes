@@ -38,21 +38,9 @@
         "$properties": {
           "Anchored": true,
           "Material": "Plastic",
-          "Color": [
-            17,
-            17,
-            17
-          ],
-          "Position": [
-            0,
-            0.5,
-            0
-          ],
-          "Size": [
-            4,
-            1,
-            4
-          ]
+          "Color": [ 17, 17, 17 ],
+          "Position": [ 0, 0.5, 0 ],
+          "Size": [ 4, 1, 4 ]
         }
       },
       "Baseplate": {
