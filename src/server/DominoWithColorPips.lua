@@ -13,7 +13,8 @@ end
 local function createBar(dominoBody)
     local bar = Instance.new("Part")
     local barSizeX = dominoBody.Size.x / 40
-    bar.Size = Vector3.new(barSizeX, barSizeX, dominoBody.Size.z)
+    local barSizeZ = dominoBody.Size.z * 0.9
+    bar.Size = Vector3.new(barSizeX, barSizeX, barSizeZ)
     local barPosY = dominoBody.Size.y / 2
     bar.Position = dominoBody.Position + Vector3.new(0, barPosY, 0)
     bar.Anchored = true
@@ -23,13 +24,21 @@ end
 
 local function createPipPositions(dominoBody, numPips)
     local positions = {}
+    local color = BrickColor.new("Gold")
     if numPips == 1 then
         table.insert(positions, Vector3.new(dominoBody.Size.x / 4, 0, 0))
+        color = BrickColor.new("Gold")
     elseif numPips == 2 then
         table.insert(positions, Vector3.new(dominoBody.Size.x / 8, 0, dominoBody.Size.z / 8))
         table.insert(positions, Vector3.new(dominoBody.Size.x * 3 / 8, 0, -dominoBody.Size.z / 8))
+        color = BrickColor.new("Lime green")
+    elseif numPips == 3 then
+        table.insert(positions, Vector3.new(dominoBody.Size.x / 8, 0, dominoBody.Size.z / 4))
+        table.insert(positions, Vector3.new(dominoBody.Size.x / 4, 0, 0))
+        table.insert(positions, Vector3.new(dominoBody.Size.x * 3 / 8, 0, -dominoBody.Size.z / 4))
+        color = BrickColor.new("Plum")
     end
-    return positions
+    return positions, color
 end
 
 local function createPip(dominoBody, positionOffset)
@@ -44,39 +53,66 @@ local function createPip(dominoBody, positionOffset)
     return pip
 end
 
+local function createPips(body, pipValue1, pipValue2)
+    local pips = {}
+
+    local positions, color = createPipPositions(body, pipValue1)
+    for _,offset in ipairs(positions) do
+        local pip = createPip(body, offset)
+        pip.BrickColor = color
+        table.insert(pips, pip)
+    end
+
+    positions, color = createPipPositions(body, pipValue2)
+    for _,offset in ipairs(positions) do
+        local pip = createPip(body, -offset)
+        pip.BrickColor = color
+        table.insert(pips, pip)
+    end
+
+    return pips
+end
+
 function DominoWithColorPips.new(pipValue1, pipValue2)
     local body = createDominoBody()
     local bar = createBar(body)
-    local partsToSubtract = {bar}
+    local pips = createPips(body, pipValue1, pipValue2)
 
-    for _,offset in ipairs(createPipPositions(body, pipValue1)) do
-        local pip = createPip(body, offset)
-        table.insert(partsToSubtract, pip)
-    end
-    for _,offset in ipairs(createPipPositions(body, pipValue2)) do
-        local pip = createPip(body, -offset)
-        table.insert(partsToSubtract, pip)
-    end
+    local partsToSubtract = { bar, table.unpack(pips) }
+    local partsToDestroy = { bar }
 
     local success, newUnion = pcall(function()
         return body:SubtractAsync(partsToSubtract)
     end)
 
     if not success then
-        warn("no success")
+        error("no success")
     elseif newUnion then
-        newUnion.Position = body.Position
-        newUnion.Anchored = false
-        newUnion.Parent = game.Workspace
+        -- newUnion.Position = body.Position
+        -- newUnion.Anchored = false
+        -- newUnion.Parent = game.Workspace
         -- Remove original parts
         body:Destroy()
-        for _,v in ipairs(partsToSubtract) do
+        for _,v in ipairs(partsToDestroy) do
             v:Destroy()
         end
-        return newUnion
+   end
+
+    local success2, newUnion2 = pcall(function()
+        return newUnion:UnionAsync(pips)
+    end)
+
+    if not success2 then
+        error("no success")
+    elseif newUnion2 then
+        newUnion2.Position = body.Position
+        newUnion2.Anchored = false
+        newUnion2.Parent = game.Workspace
+        -- Remove original parts
+        newUnion:Destroy()
     end
 
-    return nil
+    return newUnion2
 end
 
 return DominoWithColorPips
