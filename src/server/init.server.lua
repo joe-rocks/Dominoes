@@ -30,7 +30,4 @@ end
 runTests()
 
 
-local ServerScriptService = game:GetService("ServerScriptService")
-local DominoWithColorPips = require(ServerScriptService.Server.DominoWithColorPips)
-local test = DominoWithColorPips.new(1,2,6)
 

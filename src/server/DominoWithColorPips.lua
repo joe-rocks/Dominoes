@@ -21,26 +21,43 @@ local function createBar(dominoBody)
     return bar
 end
 
-local function createPip(dominoBody)
+local function createPipPositions(dominoBody, numPips)
+    local positions = {}
+    if numPips == 1 then
+        table.insert(positions, Vector3.new(dominoBody.Size.x / 4, 0, 0))
+    elseif numPips == 2 then
+        table.insert(positions, Vector3.new(dominoBody.Size.x / 8, 0, dominoBody.Size.z / 8))
+        table.insert(positions, Vector3.new(dominoBody.Size.x * 3 / 8, 0, -dominoBody.Size.z / 8))
+    end
+    return positions
+end
+
+local function createPip(dominoBody, positionOffset)
     local pip = Instance.new("Part")
     pip.Shape = Enum.PartType.Ball
     local pipSizeX = dominoBody.Size.x / 8
     pip.Size = Vector3.new(pipSizeX)
-    local pipPosX = dominoBody.Size.x / 4
 	local pipPosY = dominoBody.Size.y / 2
-    pip.Position = dominoBody.Position + Vector3.new(pipPosX, pipPosY, 0)
+    pip.Position = dominoBody.Position + Vector3.new(0, pipPosY, 0) + positionOffset
     pip.Anchored = true
     pip.Parent = game.Workspace
     return pip
 end
 
-function DominoWithColorPips.new(pipValue1, pipValue2, highestPipValue)
-    print(pipValue1,pipValue2,highestPipValue)
+function DominoWithColorPips.new(pipValue1, pipValue2)
     local body = createDominoBody()
     local bar = createBar(body)
-    local pip = createPip(body)
+    local partsToSubtract = {bar}
 
-    local partsToSubtract = {pip, bar}
+    for _,offset in ipairs(createPipPositions(body, pipValue1)) do
+        local pip = createPip(body, offset)
+        table.insert(partsToSubtract, pip)
+    end
+    for _,offset in ipairs(createPipPositions(body, pipValue2)) do
+        local pip = createPip(body, -offset)
+        table.insert(partsToSubtract, pip)
+    end
+
     local success, newUnion = pcall(function()
         return body:SubtractAsync(partsToSubtract)
     end)
