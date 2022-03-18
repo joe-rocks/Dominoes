@@ -17,6 +17,7 @@ local function createBar(dominoBody)
     bar.Size = Vector3.new(barSizeX, barSizeX, barSizeZ)
     local barPosY = dominoBody.Size.y / 2
     bar.Position = dominoBody.Position + Vector3.new(0, barPosY, 0)
+    bar.BrickColor = BrickColor.Black()
     bar.Anchored = true
     bar.Parent = game.Workspace
     return bar
@@ -78,28 +79,28 @@ function DominoWithColorPips.new(pipValue1, pipValue2)
     local bar = createBar(body)
     local pips = createPips(body, pipValue1, pipValue2)
 
-    local partsToSubtract = { bar, table.unpack(pips) }
-    local partsToDestroy = { bar }
+    local partsToUnion = { bar, table.unpack(pips) }
 
     local success, newUnion = pcall(function()
-        return body:SubtractAsync(partsToSubtract)
+        return body:SubtractAsync(partsToUnion)
     end)
+
+    if #pips == 0 then
+        newUnion.Position = body.Position
+        newUnion.Anchored = false
+        newUnion.Parent = game.Workspace
+        return newUnion
+    end
 
     if not success then
         error("no success")
     elseif newUnion then
-        -- newUnion.Position = body.Position
-        -- newUnion.Anchored = false
-        -- newUnion.Parent = game.Workspace
         -- Remove original parts
         body:Destroy()
-        for _,v in ipairs(partsToDestroy) do
-            v:Destroy()
-        end
    end
 
     local success2, newUnion2 = pcall(function()
-        return newUnion:UnionAsync(pips)
+        return newUnion:UnionAsync(partsToUnion)
     end)
 
     if not success2 then
@@ -110,6 +111,9 @@ function DominoWithColorPips.new(pipValue1, pipValue2)
         newUnion2.Parent = game.Workspace
         -- Remove original parts
         newUnion:Destroy()
+        for _,v in ipairs(partsToUnion) do
+            v:Destroy()
+        end
     end
 
     return newUnion2
