@@ -30,14 +30,35 @@ local function createPipPositions(dominoBody, numPips)
         table.insert(positions, Vector3.new(dominoBody.Size.x / 4, 0, 0))
         color = BrickColor.new("Gold")
     elseif numPips == 2 then
-        table.insert(positions, Vector3.new(dominoBody.Size.x / 8, 0, dominoBody.Size.z / 8))
+        table.insert(positions, Vector3.new(dominoBody.Size.x * 1 / 8, 0, dominoBody.Size.z / 8))
         table.insert(positions, Vector3.new(dominoBody.Size.x * 3 / 8, 0, -dominoBody.Size.z / 8))
-        color = BrickColor.new("Lime green")
+        color = BrickColor.new("Bright red")
     elseif numPips == 3 then
-        table.insert(positions, Vector3.new(dominoBody.Size.x / 8, 0, dominoBody.Size.z / 4))
-        table.insert(positions, Vector3.new(dominoBody.Size.x / 4, 0, 0))
+        table.insert(positions, Vector3.new(dominoBody.Size.x * 1 / 8, 0, dominoBody.Size.z / 4))
+        table.insert(positions, Vector3.new(dominoBody.Size.x * 2 / 8, 0, 0))
         table.insert(positions, Vector3.new(dominoBody.Size.x * 3 / 8, 0, -dominoBody.Size.z / 4))
         color = BrickColor.new("Plum")
+    elseif numPips == 4 then
+        table.insert(positions, Vector3.new(dominoBody.Size.x * 1 / 8, 0, dominoBody.Size.z / 4))
+        table.insert(positions, Vector3.new(dominoBody.Size.x * 1 / 8, 0, -dominoBody.Size.z / 4))
+        table.insert(positions, Vector3.new(dominoBody.Size.x * 3 / 8, 0, -dominoBody.Size.z / 4))
+        table.insert(positions, Vector3.new(dominoBody.Size.x * 3 / 8, 0, dominoBody.Size.z / 4))
+        color = BrickColor.new("Electric blue")
+    elseif numPips == 5 then
+        table.insert(positions, Vector3.new(dominoBody.Size.x * 1 / 8, 0, dominoBody.Size.z / 4))
+        table.insert(positions, Vector3.new(dominoBody.Size.x * 1 / 8, 0, -dominoBody.Size.z / 4))
+        table.insert(positions, Vector3.new(dominoBody.Size.x * 3 / 8, 0, -dominoBody.Size.z / 4))
+        table.insert(positions, Vector3.new(dominoBody.Size.x * 3 / 8, 0, dominoBody.Size.z / 4))
+        table.insert(positions, Vector3.new(dominoBody.Size.x / 4, 0, 0))
+        color = BrickColor.new("Camo")
+    elseif numPips == 6 then
+        table.insert(positions, Vector3.new(dominoBody.Size.x * 1 / 8, 0, dominoBody.Size.z / 4))
+        table.insert(positions, Vector3.new(dominoBody.Size.x * 1 / 8, 0, -dominoBody.Size.z / 4))
+        table.insert(positions, Vector3.new(dominoBody.Size.x * 2 / 8, 0, dominoBody.Size.z / 4))
+        table.insert(positions, Vector3.new(dominoBody.Size.x * 2 / 8, 0, -dominoBody.Size.z / 4))
+        table.insert(positions, Vector3.new(dominoBody.Size.x * 3 / 8, 0, -dominoBody.Size.z / 4))
+        table.insert(positions, Vector3.new(dominoBody.Size.x * 3 / 8, 0, dominoBody.Size.z / 4))
+        color = BrickColor.new("Hot pink")
     end
     return positions, color
 end
@@ -74,48 +95,54 @@ local function createPips(body, pipValue1, pipValue2)
     return pips
 end
 
+local function unionPcall(unionType, target, partsToUnion, isUpdatePosition)
+    local success, newUnion = pcall(function()
+        return target[unionType](target, partsToUnion)
+    end)
+
+    if not success then
+        error(unionType.." failed")
+    elseif newUnion then
+        if isUpdatePosition then
+            newUnion.Position = target.Position
+        end
+        target:Destroy()
+        return newUnion
+    end
+end
+
+local function negate(target, partsToNegate)
+    return unionPcall("SubtractAsync", target, partsToNegate)
+end
+
+local function union(target, partsToUnion)
+    return unionPcall("UnionAsync", target, partsToUnion)
+end
+
 function DominoWithColorPips.new(pipValue1, pipValue2)
+    local startTime = os.time()
     local body = createDominoBody()
     local bar = createBar(body)
     local pips = createPips(body, pipValue1, pipValue2)
-
     local partsToUnion = { bar, table.unpack(pips) }
 
-    local success, newUnion = pcall(function()
-        return body:SubtractAsync(partsToUnion)
-    end)
+    local newUnion = negate(body, partsToUnion)
 
     if #pips == 0 then
-        newUnion.Position = body.Position
         newUnion.Anchored = false
         newUnion.Parent = game.Workspace
         return newUnion
     end
 
-    if not success then
-        error("no success")
-    elseif newUnion then
-        -- Remove original parts
-        body:Destroy()
-   end
-
-    local success2, newUnion2 = pcall(function()
-        return newUnion:UnionAsync(partsToUnion)
-    end)
-
-    if not success2 then
-        error("no success")
-    elseif newUnion2 then
-        newUnion2.Position = body.Position
-        newUnion2.Anchored = false
-        newUnion2.Parent = game.Workspace
-        -- Remove original parts
-        newUnion:Destroy()
-        for _,v in ipairs(partsToUnion) do
-            v:Destroy()
-        end
+    local newUnion2 = union(newUnion, partsToUnion)
+    newUnion2.Anchored = false
+    newUnion2.Parent = game.Workspace
+    for _,v in ipairs(partsToUnion) do
+        v:Destroy()
     end
 
+    local elapsedTime = os.time() - startTime
+    print(pipValue2,pipValue1,elapsedTime)
     return newUnion2
 end
 
