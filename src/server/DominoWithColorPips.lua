@@ -1,10 +1,14 @@
 local DominoWithColorPips = {}
 DominoWithColorPips.__index = DominoWithColorPips
 
-local function createDominoBody()
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Knit = require(ReplicatedStorage.Knit)
+local Promise = require(Knit.Util.Promise)
+
+local function createDominoBody(position)
     local part = Instance.new("Part")
     part.Size = Vector3.new(8, 1, 4)
-    part.Position = Vector3.new(0, 8, -15)
+    part.Position = position
     part.Anchored = true
     part.Parent = game.Workspace
     return part
@@ -96,19 +100,21 @@ local function createPips(body, pipValue1, pipValue2)
 end
 
 local function unionPcall(unionType, target, partsToUnion, isUpdatePosition)
-    local success, newUnion = pcall(function()
-        return target[unionType](target, partsToUnion)
-    end)
-
-    if not success then
-        error(unionType.." failed")
-    elseif newUnion then
-        if isUpdatePosition then
-            newUnion.Position = target.Position
-        end
-        target:Destroy()
-        return newUnion
-    end
+    return Promise.new(function(resolve, reject)
+        local success, newUnion = pcall(function()
+            return target[unionType](target, partsToUnion)
+        end)
+    
+		if success then
+            if isUpdatePosition then
+                newUnion.Position = target.Position
+            end
+            target:Destroy()
+			resolve(newUnion)
+		else
+            reject(newUnion)
+		end
+	end)
 end
 
 local function negate(target, partsToNegate)
@@ -119,31 +125,41 @@ local function union(target, partsToUnion)
     return unionPcall("UnionAsync", target, partsToUnion)
 end
 
-function DominoWithColorPips.new(pipValue1, pipValue2)
+function DominoWithColorPips.new(pipValue1, pipValue2, position)
     local startTime = os.time()
-    local body = createDominoBody()
+    local body = createDominoBody(position)
     local bar = createBar(body)
     local pips = createPips(body, pipValue1, pipValue2)
     local partsToUnion = { bar, table.unpack(pips) }
+    local self = {}
 
-    local newUnion = negate(body, partsToUnion)
+    negate(body, partsToUnion)
+    :andThen(function(newUnion)
+        print(pipValue2,pipValue1,"negate")
+        if #pips == 0 then
+            newUnion.Anchored = false
+            newUnion.Parent = game.Workspace
+            newUnion.Position = position
+            self.union = newUnion
+            return
+        end
 
-    if #pips == 0 then
-        newUnion.Anchored = false
-        newUnion.Parent = game.Workspace
-        return newUnion
-    end
+        union(newUnion, partsToUnion)
+        :andThen(function(newUnion2)
+            newUnion2.Anchored = false
+            newUnion2.Parent = game.Workspace
+            newUnion2.Position = position
+            for _,v in ipairs(partsToUnion) do
+                v:Destroy()
+            end
+    
+            local elapsedTime = os.time() - startTime
+            print(pipValue2,pipValue1,elapsedTime)
+            self.union = newUnion2
+        end)
+    end)
 
-    local newUnion2 = union(newUnion, partsToUnion)
-    newUnion2.Anchored = false
-    newUnion2.Parent = game.Workspace
-    for _,v in ipairs(partsToUnion) do
-        v:Destroy()
-    end
-
-    local elapsedTime = os.time() - startTime
-    print(pipValue2,pipValue1,elapsedTime)
-    return newUnion2
+    return self
 end
 
 return DominoWithColorPips

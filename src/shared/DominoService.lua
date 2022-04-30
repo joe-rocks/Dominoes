@@ -13,30 +13,29 @@ local DominoService = Knit.CreateService {
 }
 
 function DominoService:KnitInit()
-    local moveRight = CFrame.new( workspace.Pip.Size.X * 1.2, 0, 0 )
-    local startPosition = CFrame.new( 0, 3, -10 )
+    local startPosition = Vector3.new(0, 8, -15)
+    local moveBackward = Vector3.new(0, 0, -5)
     local currentPosition = startPosition
-
-    local testStartPosition = Vector3.new(0, 8, -15)
-    local testMoveBackward = Vector3.new(0, 0, -5)
-    local testCurrentPosition = testStartPosition
-    local testStartTime = os.time()
 
     for i = 0,self.highestPipValue do
         for j = i,self.highestPipValue do
-            local test = DominoWithColorPips.new(i,j)
-            test.Position = testCurrentPosition
-            testCurrentPosition += testMoveBackward
-            print("ExecuteTime",j,i,os.time()-testStartTime)
-
             local object = Domino.new(i,j)
-            local model = ColorDomino.new(i, j, self.highestPipValue)
-            local domino = { object=object, model=model }
+            local plainDomino = ColorDomino.new(i, j, currentPosition)
+            local domino = { object=object, model=plainDomino }
             table.insert(self.Dominoes, domino)
-            model.PrimaryPart.CFrame = currentPosition
-            currentPosition *= moveRight
+            currentPosition += moveBackward
         end
     end
+
+    -- currentPosition = startPosition + Vector3.new(10)
+    -- for _,domino in ipairs(self.Dominoes) do
+    --     local fancyDomino = DominoWithColorPips.new(
+    --         domino.object.pip1,
+    --         domino.object.pip2,
+    --         currentPosition)
+    --     domino.model = fancyDomino
+    --     currentPosition += moveBackward
+    -- end
 end
 
 return DominoService

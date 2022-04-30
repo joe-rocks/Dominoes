@@ -1,29 +1,28 @@
-local Knit = require(game:GetService("ReplicatedStorage").Knit)
--- local Signal = require(Knit.Util.Signal)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
+
+local Knit = require(ReplicatedStorage.Knit)
 local RemoteSignal = require(Knit.Util.Remote.RemoteSignal)
--- local RemoteProperty = require(Knit.Util.Remote.RemoteProperty)
+local Board = require(ServerScriptService.Server.Board)
 
 local BoardService = Knit.CreateService {
     Name = "BoardService";
+    Board = Board.new();
     Client = {
         AddDomino = RemoteSignal.new();
     };
 }
 
+local function createBoard()
+    local board = Instance.new("Part")
+end
 
 -- Initialize
 function BoardService:KnitInit()
 
     self.Client.AddDomino:Connect(function(player,domino,location)
-        local dominoList = self.Locations[location]
-        if location == "Spinner" and not dominoList then
-            dominoList = domino
-            self.PipValues[location] = domino:getPipValue()
-        elseif dominoList then
-            table.insert( dominoList, domino )
-            if self.PipValues[location] == domino:getPipValue() then
-                self.PipValues[location] = "foo"
-            end
+        if self.Board:AddDomino(domino,location) then
+            print(player," played",domino," at ",location)
         end
     end)
 

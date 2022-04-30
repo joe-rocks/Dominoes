@@ -22,16 +22,8 @@ local function createText(parent)
     return text
 end
 
-local function createColor(pipValue, highestPipValue)
-    local red = (highestPipValue-pipValue) / highestPipValue
-    local green = 0
-    local blue = pipValue / highestPipValue
-    return Color3.new( red, green, blue )
-end
-
-local function createHalfDomino(pipValue, highestPipValue)
+local function createHalfDomino(pipValue)
     local part = workspace.Pip:Clone()
-    part.Color = createColor(pipValue, highestPipValue)
     part.Name = "Pip_" .. pipValue
     part.Anchored = false
     local gui = createGui(part)
@@ -45,6 +37,7 @@ local function createWeld(model, part1, part2)
     WeldConstraint.Part0 = part1
     WeldConstraint.Part1 = part2
     WeldConstraint.Parent = model
+    return WeldConstraint
 end
 
 local function createDomino(part1, part2, pipValue1, pipValue2)
@@ -53,21 +46,22 @@ local function createDomino(part1, part2, pipValue1, pipValue2)
     model.PrimaryPart = part1
     part1.Parent = model
     part2.Parent = model
+    createWeld(model, part1, part2)
     return model
 end
 
 local ColorDomino = {}
 ColorDomino.__index = ColorDomino
 
-function ColorDomino.new(pipValue1, pipValue2, highestPipValue)
-    local part1 = createHalfDomino(pipValue1, highestPipValue)
-    local part2 = createHalfDomino(pipValue2, highestPipValue)
+function ColorDomino.new(pipValue1, pipValue2, position)
+    local part1 = createHalfDomino(pipValue1)
+    local part2 = createHalfDomino(pipValue2)
+    part1.BrickColor = BrickColor.new("Tr. Yellow")
+    part2.BrickColor = BrickColor.new("Deep blue")
     local domino = createDomino(part1, part2, pipValue1, pipValue2)
-    createWeld(domino, part1, part2)
-    part1.Parent = domino
-    part2.Parent = domino
+    part1.Position = position
+    part2.Position = part1.Position + Vector3.new( part1.Size.X, 0, 0 )
     domino.Parent = workspace
-    part2.Position = part1.Position + Vector3.new( 0, 0, part1.Size.Z )
     return domino
 end
 
