@@ -26,21 +26,24 @@ function DrawPileService:shuffle()
         table.insert(self.DrawPile, domino)
     end
 
-    -- local seed = 5
-    -- self.rand = Random.new(seed)
-    -- local n = #self.DrawPile
-    -- for _ = 0,42 do
-	-- 	local x = self.rand:NextInteger(1,n)
-	-- 	local y = self.rand:NextInteger(1,n)
-    --     local a = self.DrawPile[x].model.PrimaryPart
-    --     local b = self.DrawPile[y].model.PrimaryPart
-	-- 	a.CFrame,b.CFrame = b.CFrame,a.CFrame
-    -- end
-
-    for _,v in ipairs(self.DrawPile) do
-        local j = JumpUp.new(v.model.PrimaryPart)
-        j:activate()
+    local seed = 5
+    self.rand = Random.new(seed)
+    local n = #self.DrawPile
+    for _ = 0,42 do
+        -- Get two random dominoes
+		local r1,r2 = self.rand:NextInteger(1,n), self.rand:NextInteger(1,n)
+        local x,y = self.DrawPile[r1], self.DrawPile[r2]
+        -- Swap the domino objects
+        x.object, y.object = y.object, x.object
+        -- Swap the domino parts
+        local a,b = x.model.PrimaryPart, y.model.PrimaryPart
+		a.CFrame,b.CFrame = b.CFrame,a.CFrame
     end
+
+    -- for _,v in ipairs(self.DrawPile) do
+    --     local j = JumpUp.new(v.model.PrimaryPart)
+    --     j:activate()
+    -- end
 
 end
 

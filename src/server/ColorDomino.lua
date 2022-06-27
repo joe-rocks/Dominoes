@@ -61,7 +61,7 @@ function ColorDomino.new(pipValue1, pipValue2, position)
     local domino = createDomino(part1, part2, pipValue1, pipValue2)
     part1.Position = position
     part2.Position = part1.Position + Vector3.new( part1.Size.X, 0, 0 )
-    domino.Parent = workspace
+    domino.Parent = workspace.DominoParts
     return domino
 end
 

@@ -10,20 +10,36 @@ local DominoService = Knit.CreateService {
     Name = "DominoService";
     Dominoes = {};
     highestPipValue = 6;
+    DominoHeight = 9;
+    DominoWidth = 5;
 }
 
 function DominoService:KnitInit()
     local startPosition = Vector3.new(0, 8, -15)
-    local moveBackward = Vector3.new(0, 0, -5)
-    local currentPosition = startPosition
+
+    local folder = Instance.new("Folder")
+    folder.Name = "DominoParts"
+    folder.Parent = workspace
+
+    local row, numRows = 0, (self.highestPipValue + 2) / 2
+    local col, numColumns = 0, self.highestPipValue + 1
 
     for i = 0,self.highestPipValue do
         for j = i,self.highestPipValue do
+            row += 1
+            if row == numRows then
+                row = 0
+            end
+            col += 1
+            if col == numColumns then
+                col = 0
+            end
+            local pos = startPosition + Vector3.new(-self.DominoHeight*row, 0, -self.DominoWidth*col)
+
             local object = Domino.new(i,j)
-            local plainDomino = ColorDomino.new(i, j, currentPosition)
+            local plainDomino = ColorDomino.new(i, j, pos)
             local domino = { object=object, model=plainDomino }
             table.insert(self.Dominoes, domino)
-            currentPosition += moveBackward
         end
     end
 

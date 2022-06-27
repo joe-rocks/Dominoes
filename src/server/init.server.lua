@@ -3,12 +3,13 @@ local Knit = require(ReplicatedStorage.Knit)
 
 require(ReplicatedStorage.Common.PointsService)
 require(ReplicatedStorage.Common.DominoService)
+require(ReplicatedStorage.Common.BoardService)
 local DrawPile = require(ReplicatedStorage.Common.DrawPileService)
 
 Knit.Start():Catch(warn)
 
 wait(2)
--- DrawPile:shuffle()
+DrawPile:shuffle()
 
 
 ---------------------------------------------------------------------------------------------------

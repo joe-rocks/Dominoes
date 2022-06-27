@@ -3,19 +3,37 @@ local ServerScriptService = game:GetService("ServerScriptService")
 
 local Knit = require(ReplicatedStorage.Knit)
 local RemoteSignal = require(Knit.Util.Remote.RemoteSignal)
-local Board = require(ServerScriptService.Server.Board)
+
+local server = ServerScriptService.Server
+local Board = require(server.Board)
+
+local shared = ReplicatedStorage.Common
+local DominoService = require(shared.DominoService)
+
+local dh = DominoService.DominoHeight
+local dw = DominoService.DominoWidth
+
+local function createBoard()
+    local boardPart = Instance.new("Part")
+    boardPart.Position = Vector3.new( -12, 3, -30 )
+    boardPart.Size = Vector3.new(
+        dh * 4 + 2 + dh * 4,
+        0.5,
+        dw * 7 + 2 + dh * 4)
+    boardPart.BrickColor = BrickColor.new("Parsley green")
+    boardPart.Name = "Board"
+    boardPart.Parent = workspace
+    return boardPart
+end
 
 local BoardService = Knit.CreateService {
     Name = "BoardService";
-    Board = Board.new();
+    BoardObject = Board.new();
+    BoardPart = createBoard();
     Client = {
         AddDomino = RemoteSignal.new();
     };
 }
-
-local function createBoard()
-    local board = Instance.new("Part")
-end
 
 -- Initialize
 function BoardService:KnitInit()
